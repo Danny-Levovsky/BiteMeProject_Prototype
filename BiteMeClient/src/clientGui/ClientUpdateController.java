@@ -25,6 +25,10 @@ public class ClientUpdateController {
     @FXML
     private Label lableSuccess;
     
+
+    @FXML
+    private Label lableUpdateFail;
+    
     @FXML
     private Label lableFilldsNotFull;
     
@@ -63,6 +67,7 @@ public class ClientUpdateController {
 		lableNotFound.setVisible(false);
 		lableFilldsNotFull.setVisible(false);
 		lableSuccess.setVisible(false);
+		lableUpdateFail.setVisible(false);
         
     }
 	
@@ -94,6 +99,7 @@ public class ClientUpdateController {
         String orderNumber = txtOrderNumber.getText();
         String totalPrice = txtTotalPrice.getText();
         String orderAddress = txtOrderAddress.getText();
+        
 
         if (!orderNumber.isEmpty() && !totalPrice.isEmpty() && !orderAddress.isEmpty()) {
             ArrayList<String> updateDetails = new ArrayList<>();
@@ -104,28 +110,38 @@ public class ClientUpdateController {
             // Assuming localhost and port 5555 for connection
             client = new BiteMeClient("localhost", 5555);
             client.requestUpdateOrder(updateDetails);
-            
-            if(this.msg.equals("Order not found")){
+            System.out.println("Clint print:" + msg);
+            if(msg.equals("Order not found")){
             	lableNotFound.setVisible(true);
                 lableFilldsNotFull.setVisible(false);
                 lableSuccess.setVisible(false);
+                lableUpdateFail.setVisible(false);
 
             	
-            }else if(this.msg.equals("Order updated successfully!")) {
+            }else if(msg.equals("Order updated successfully!")) {
             	lableNotFound.setVisible(false);
                 lableFilldsNotFull.setVisible(false);
                 lableSuccess.setVisible(true);
+                lableUpdateFail.setVisible(false);
+            	
+            }else {
+            	lableNotFound.setVisible(false);
+                lableFilldsNotFull.setVisible(false);
+                lableSuccess.setVisible(false);
+                lableUpdateFail.setVisible(true);
             	
             }
         } else if(orderNumber.isEmpty() || totalPrice.isEmpty() || orderAddress.isEmpty()){
             lableFilldsNotFull.setVisible(true);
             lableNotFound.setVisible(false);
             lableSuccess.setVisible(false);
+            lableUpdateFail.setVisible(false);
             // You can display an error message to the user in the GUI if needed
         }
         
     }
 	public void getmessage(Object msg) {
+		System.out.println("Clint print: Im in getmessage");
 		this.msg = (String) msg;
 		
 	}

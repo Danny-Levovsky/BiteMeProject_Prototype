@@ -34,6 +34,11 @@ public class ClientMainMenuController {
 		Stage primaryStage = new Stage();
 		Pane root = loader.load(getClass().getResource("/clientGui/ClientUpdate.fxml").openStream());
 	
+		ClientUpdateController updateController = loader.getController();
+		
+		BiteMeClient client = new BiteMeClient("localhost", 5555);
+		client.setUpdateController(updateController);
+		
 		Scene scene = new Scene(root);			
 		primaryStage.setTitle("Update Tool");
 		primaryStage.setScene(scene);		

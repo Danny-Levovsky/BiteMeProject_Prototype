@@ -9,5 +9,6 @@
 	<classpathentry kind="src" path="BiteMeServer/src"/>
 	<classpathentry kind="src" path="OCSF/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/javaFx"/>
+	<classpathentry kind="lib" path="C:/Degree/Year 3/Semester 2/Engineering methods for developing software systems/Practice/Practice 3/Ex-03-WorkbenchJDBC/mysql-connector-java-8.0.13.jar"/>
 	<classpathentry kind="output" path="BiteMeClient/bin"/>
 </classpath>

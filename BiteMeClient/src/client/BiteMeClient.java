@@ -25,6 +25,7 @@ public class BiteMeClient extends AbstractClient {
   @Override
   protected void handleMessageFromServer(Object msg) {
       if (msg instanceof ArrayList) {
+    	  System.out.println("Clinet: Message from server -  msg instanceof ArrayList" + msg);
     	  //get array list from server
           ArrayList<String> orders = (ArrayList<String>) msg;
           //set new array list
@@ -57,6 +58,10 @@ public class BiteMeClient extends AbstractClient {
   //get an instance of display controller - used to deliver data
   public void setDisplayController(ClientDisplayController displayController) {
       this.displayController = displayController;
+  }
+  
+  public void setUpdateController(ClientUpdateController updateController) {
+      this.updateController = updateController;
   }
 
   //used in client display controller - get data from server
