@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="clientGui.ClientDisplayController">
+    <children>
+        <Button fx:id="btnBack" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#getBackBtn" text="Back" />
+        <TableView fx:id="ordersTable" layoutX="0.0" layoutY="54.0" prefHeight="400.0" prefWidth="600.0">
+            <columns>
+                <TableColumn fx:id="restaurantColumn" prefWidth="120.0" text="Restaurant" />
+                <TableColumn fx:id="orderNumberColumn" prefWidth="120.0" text="Order Number" />
+                <TableColumn fx:id="totalPriceColumn" prefWidth="120.0" text="Total Price" />
+                <TableColumn fx:id="orderListNumberColumn" prefWidth="120.0" text="Order List Number" />
+                <TableColumn fx:id="orderAddressColumn" prefWidth="120.0" text="Order Address" />
+            </columns>
+        </TableView>
+    </children>
+</AnchorPane>
