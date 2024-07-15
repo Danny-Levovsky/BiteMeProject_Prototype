@@ -3,10 +3,14 @@ import java.io.*;
 import ocsf.server.*;
 import java.sql.*;
 import java.util.ArrayList;
+
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+
 
 
 public class BiteMeServer extends AbstractServer 
@@ -15,6 +19,8 @@ public class BiteMeServer extends AbstractServer
   private static final String DB_USER = "root";
   private static final String DB_PASSWORD = "Aa123456";
   private Connection connection;
+  private ConnectionToClient client;
+
   final public static int DEFAULT_PORT = 5555;
   
   public BiteMeServer(int port) 
@@ -34,10 +40,9 @@ public class BiteMeServer extends AbstractServer
 	    if (msg instanceof ArrayList) {
 	      ArrayList<String> details = (ArrayList<String>) msg;
 	      if (details.size() == 3) {
-	          updateOrder(details);
-	        } else if (details.size() >= 5) {
-	          insertOrderDetails(details);
-	        } else {
+	          updateOrder(details,client);
+	        } 
+	      else {
 	          System.out.println("Insufficient details received from client.");
 	      }
 	    } else if (msg.equals("fetchOrders")) {
@@ -48,25 +53,6 @@ public class BiteMeServer extends AbstractServer
 	      System.out.println("Message received: " + msg);
 	    }
 	  }
-
-  private void insertOrderDetails(ArrayList<String> details) {
-    String sql = "INSERT INTO orders (Restaurant, Order_number, Total_price, Order_list_number, Order_address) VALUES (?, ?, ?, ?, ?)";
-
-    try (PreparedStatement statement = connection.prepareStatement(sql)) {
-      statement.setString(1, details.get(0));
-      statement.setInt(2, Integer.parseInt(details.get(1)));
-      statement.setInt(3, Integer.parseInt(details.get(2)));
-      statement.setInt(4, Integer.parseInt(details.get(3)));
-      statement.setString(5, details.get(4));
-
-      int rowsInserted = statement.executeUpdate();
-      if (rowsInserted > 0) {
-        System.out.println("A new order was inserted successfully!");
-      }
-    } catch (SQLException e) {
-      System.out.println("Error inserting order: " + e.getMessage());
-    }
-  }
 
   private void fetchAndSendOrdersToClient(ConnectionToClient client) {
 	    String sql = "SELECT * FROM orders";
@@ -103,35 +89,38 @@ public class BiteMeServer extends AbstractServer
 	    }
 	  }
   
-  private void updateOrder(ArrayList<String> details) {
-	    String orderNumber = details.get(0);
-	    String column = details.get(1);
-	    String newValue = details.get(2);
+  private void updateOrder(ArrayList<String> details,ConnectionToClient client) {
+      String orderNumber = details.get(0);
+      String totalPrice = details.get(1);
+      String orderAddress = details.get(2);
 
-	    if (!column.equals("Total_price") && !column.equals("Order_address")) {
-	      System.out.println("Invalid column name provided: " + column);
-	      return;
-	    }
+      String sql = "UPDATE orders SET Total_price = ?, Order_address = ? WHERE Order_number = ?";
 
-	    String sql = "UPDATE orders SET " + column + " = ? WHERE Order_number = ?";
+      try (PreparedStatement statement = connection.prepareStatement(sql)) {
+          statement.setInt(1, Integer.parseInt(totalPrice));
+          statement.setString(2, orderAddress);
+          statement.setInt(3, Integer.parseInt(orderNumber));
 
-	    try (PreparedStatement statement = connection.prepareStatement(sql)) {
-	      if (column.equals("Total_price")) {
-	        statement.setInt(1, Integer.parseInt(newValue));
-	      } else {
-	        statement.setString(1, newValue);
-	      }
-	      statement.setInt(2, Integer.parseInt(orderNumber));
-
-	      int rowsUpdated = statement.executeUpdate();
-	      if (rowsUpdated > 0) {
-	        System.out.println("Order updated successfully!");
-	      }
-	    } catch (SQLException e) {
-	      System.out.println("Error updating order: " + e.getMessage());
+          int rowsUpdated = statement.executeUpdate();
+          if (rowsUpdated > 0) {
+              System.out.println("Order updated successfully!");
+              sendMessageToClient(client, "Order updated successfully!");
+          } else {
+              System.out.println("Order not found or no update necessary.");
+              sendMessageToClient(client, "Order not found or no update necessary");
+          }
+      } catch (SQLException e) {
+          System.out.println("Error updating order: " + e.getMessage());
+      }
+  }
+  
+  private void sendMessageToClient(ConnectionToClient client, String message) {
+	    try {
+	      client.sendToClient(message);
+	    } catch (IOException e) {
+	      System.out.println("Error sending message to client: " + e.getMessage());
 	    }
 	  }
-
   
   protected void serverStarted()
   {
