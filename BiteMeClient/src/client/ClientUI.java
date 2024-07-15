@@ -1,5 +1,6 @@
 package client;
 
+import clientGui.ClientConnectController;
 import clientGui.ClientMainMenuController;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -19,7 +20,7 @@ public class ClientUI extends Application {
     public void start(Stage primaryStage) throws Exception {
         biteMeClient = new BiteMeClient(HOST, PORT);
 
-        ClientMainMenuController cFrame = new ClientMainMenuController();
+        ClientConnectController cFrame = new ClientConnectController();
         cFrame.start(primaryStage);
     }
 }

@@ -107,7 +107,7 @@ public class BiteMeServer extends AbstractServer
               sendMessageToClient(client, "Order updated successfully!");
           } else {
               System.out.println("Order not found or no update necessary.");
-              sendMessageToClient(client, "Order not found or no update necessary");
+              sendMessageToClient(client, "Order not found");
           }
       } catch (SQLException e) {
           System.out.println("Error updating order: " + e.getMessage());

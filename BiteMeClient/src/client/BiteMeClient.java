@@ -6,12 +6,14 @@ import java.util.Scanner;
 
 import clientGui.ClientDisplayController;
 import clientGui.ClientMainMenuController;
+import clientGui.ClientUpdateController;
 import clientGui.Order;
 import ocsf.client.AbstractClient;
 
 //biteMeclient is responsible for communication with the server
 public class BiteMeClient extends AbstractClient {
 	private ClientDisplayController displayController;
+	private ClientUpdateController updateController;
 
   public BiteMeClient(String host, int port) throws IOException {
     super(host, port);
@@ -48,8 +50,10 @@ public class BiteMeClient extends AbstractClient {
           }
       } else {
           System.out.println("Message from server: " + msg);
+          updateController.getmessage(msg);
       }
   }
+  
   //get an instance of display controller - used to deliver data
   public void setDisplayController(ClientDisplayController displayController) {
       this.displayController = displayController;
@@ -63,6 +67,7 @@ public class BiteMeClient extends AbstractClient {
 	      System.out.println("Error sending fetch request to server: " + e.getMessage());
 	    }
 	  }
+  
   // to be changed later
   public void requestConnectivityDetails() {
 	    try {
@@ -71,6 +76,7 @@ public class BiteMeClient extends AbstractClient {
 	      System.out.println("Error sending connectivity request to server: " + e.getMessage());
 	    }
 	  }
+  
   //used in client update controller - send server new data to update in database
   public void requestUpdateOrder(ArrayList<String> updateDetails) {
 	    try {

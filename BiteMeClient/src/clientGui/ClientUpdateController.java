@@ -20,12 +20,22 @@ public class ClientUpdateController {
 
     @FXML
     private Label lblOrderNumber;
+    
 
+    @FXML
+    private Label lableSuccess;
+    
+    @FXML
+    private Label lableFilldsNotFull;
+    
     @FXML
     private Label lblTotalPrice;
     
     @FXML
     private Label lblOrderAddress;
+    
+    @FXML
+    private Label lableNotFound;
 
     @FXML
     private Button btnBack;
@@ -44,6 +54,18 @@ public class ClientUpdateController {
     
     private BiteMeClient client;
 
+	private String msg;
+
+	
+	@FXML
+    public void initialize() {
+        // Hide the labels when the controller initializes
+		lableNotFound.setVisible(false);
+		lableFilldsNotFull.setVisible(false);
+		lableSuccess.setVisible(false);
+        
+    }
+	
     @FXML
     void getBackBtn(ActionEvent event) {
     	try {
@@ -82,10 +104,30 @@ public class ClientUpdateController {
             // Assuming localhost and port 5555 for connection
             client = new BiteMeClient("localhost", 5555);
             client.requestUpdateOrder(updateDetails);
-        } else {
-            System.out.println("Please fill in all fields.");
+            
+            if(this.msg.equals("Order not found")){
+            	lableNotFound.setVisible(true);
+                lableFilldsNotFull.setVisible(false);
+                lableSuccess.setVisible(false);
+
+            	
+            }else if(this.msg.equals("Order updated successfully!")) {
+            	lableNotFound.setVisible(false);
+                lableFilldsNotFull.setVisible(false);
+                lableSuccess.setVisible(true);
+            	
+            }
+        } else if(orderNumber.isEmpty() || totalPrice.isEmpty() || orderAddress.isEmpty()){
+            lableFilldsNotFull.setVisible(true);
+            lableNotFound.setVisible(false);
+            lableSuccess.setVisible(false);
             // You can display an error message to the user in the GUI if needed
         }
+        
     }
+	public void getmessage(Object msg) {
+		this.msg = (String) msg;
+		
+	}
 
 }

@@ -27,16 +27,6 @@ public class ClientMainMenuController {
     @FXML
     private TextField iptxt;
     
-
-    public void start(Stage primaryStage) throws Exception {	
-		Parent root = FXMLLoader.load(getClass().getResource("/clientGui/ClientMainMenu.fxml"));
-				
-		Scene scene = new Scene(root);
-		primaryStage.setTitle("Client Main Menu");
-		primaryStage.setScene(scene);
-		
-		primaryStage.show();	 	   
-	}
     
     public void update(ActionEvent event) throws Exception {
     	FXMLLoader loader = new FXMLLoader();
@@ -73,7 +63,6 @@ public class ClientMainMenuController {
     
     
     public void getExitBtn(ActionEvent event) throws Exception {
-    	System.out.println("exit");
     	System.exit(0);
     }
     
