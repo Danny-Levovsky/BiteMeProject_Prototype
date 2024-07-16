@@ -50,8 +50,9 @@ public class BiteMeClient extends AbstractClient {
               System.out.println("Controller not available to send orders.");
           }
       } else {
-          System.out.println("Message from server: " + msg);
-          updateController.getmessage(msg);
+    	  if (updateController != null) {
+        	  updateController.inputResponse(msg.toString());
+    	  }
       }
   }
   

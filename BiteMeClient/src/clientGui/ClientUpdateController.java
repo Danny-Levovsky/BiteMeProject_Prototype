@@ -1,6 +1,9 @@
 package clientGui;
+import javafx.scene.paint.Color;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,29 +20,18 @@ import javafx.stage.Stage;
 import javafx.scene.Node;
 
 public class ClientUpdateController {
+	
+	@FXML
+	private Label lblServerMessage;
 
     @FXML
     private Label lblOrderNumber;
-    
-
-    @FXML
-    private Label lableSuccess;
-    
-
-    @FXML
-    private Label lableUpdateFail;
-    
-    @FXML
-    private Label lableFilldsNotFull;
     
     @FXML
     private Label lblTotalPrice;
     
     @FXML
     private Label lblOrderAddress;
-    
-    @FXML
-    private Label lableNotFound;
 
     @FXML
     private Button btnBack;
@@ -58,18 +50,7 @@ public class ClientUpdateController {
     
     private BiteMeClient client;
 
-	private String msg;
-
-	
-	@FXML
-    public void initialize() {
-        // Hide the labels when the controller initializes
-		lableNotFound.setVisible(false);
-		lableFilldsNotFull.setVisible(false);
-		lableSuccess.setVisible(false);
-		lableUpdateFail.setVisible(false);
-        
-    }
+	private String serverMessage;
 	
     @FXML
     void getBackBtn(ActionEvent event) {
@@ -107,43 +88,29 @@ public class ClientUpdateController {
             updateDetails.add(totalPrice);
             updateDetails.add(orderAddress);
 
-            // Assuming localhost and port 5555 for connection
-            client = new BiteMeClient("localhost", 5555);
-            client.requestUpdateOrder(updateDetails);
-            System.out.println("Clint print:" + msg);
-            if(msg.equals("Order not found")){
-            	lableNotFound.setVisible(true);
-                lableFilldsNotFull.setVisible(false);
-                lableSuccess.setVisible(false);
-                lableUpdateFail.setVisible(false);
-
-            	
-            }else if(msg.equals("Order updated successfully!")) {
-            	lableNotFound.setVisible(false);
-                lableFilldsNotFull.setVisible(false);
-                lableSuccess.setVisible(true);
-                lableUpdateFail.setVisible(false);
-            	
-            }else {
-            	lableNotFound.setVisible(false);
-                lableFilldsNotFull.setVisible(false);
-                lableSuccess.setVisible(false);
-                lableUpdateFail.setVisible(true);
-            	
+         // Assuming localhost and port 5555 for connection
+            if (client == null) {
+                client = new BiteMeClient("localhost", 5555);
+                client.setUpdateController(this);
             }
-        } else if(orderNumber.isEmpty() || totalPrice.isEmpty() || orderAddress.isEmpty()){
-            lableFilldsNotFull.setVisible(true);
-            lableNotFound.setVisible(false);
-            lableSuccess.setVisible(false);
-            lableUpdateFail.setVisible(false);
-            // You can display an error message to the user in the GUI if needed
+            
+            client.requestUpdateOrder(updateDetails);
+        } else {
+            System.out.println("Please fill in all fields.");
+            inputResponse("Please fill in all fields");
         }
-        
     }
-	public void getmessage(Object msg) {
-		System.out.println("Clint print: Im in getmessage");
-		this.msg = (String) msg;
-		
-	}
+    
+    public void inputResponse(String response) {
+        this.serverMessage = response;
+        Platform.runLater(() -> {
+            lblServerMessage.setText(serverMessage);
+            if ("Order updated successfully!".equals(serverMessage)) {
+                lblServerMessage.setTextFill(Color.GREEN);
+            } else {
+                lblServerMessage.setTextFill(Color.RED);
+            }
+        });
+    }
 
 }

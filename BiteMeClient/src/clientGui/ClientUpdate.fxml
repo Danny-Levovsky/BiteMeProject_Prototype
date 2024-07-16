@@ -4,7 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+
 
 <AnchorPane prefHeight="241.0" prefWidth="355.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clientGui.ClientUpdateController">
     <children>
@@ -19,25 +19,7 @@
 
         <Button fx:id="btnBack" layoutX="193.0" layoutY="121.0" mnemonicParsing="false" onAction="#getBackBtn" text="Back" />
         <Button fx:id="btnUpdate" layoutX="105.0" layoutY="121.0" mnemonicParsing="false" onAction="#updateOrderBtn" text="Update" />
-      <Label fx:id="lableNotFound" layoutX="101.0" layoutY="191.0" text="Order Number Not Found" textFill="RED">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
-      <Label fx:id="lableFilldsNotFull" layoutX="111.0" layoutY="174.0" text="Please fill in all fields" textFill="RED">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
-      <Label fx:id="lableSuccess" layoutX="93.0" layoutY="208.0" text="Order Updated Successfully" textFill="#018601">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
-      <Label fx:id="lableUpdateFail" layoutX="127.0" layoutY="157.0" text="Failed to Update" textFill="RED">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
+        <Label fx:id="lblServerMessage" layoutX="12.0" layoutY="170.0" prefWidth="222.0" wrapText="true"/>
+         
     </children>
 </AnchorPane>
