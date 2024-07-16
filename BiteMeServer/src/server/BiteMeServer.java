@@ -1,10 +1,10 @@
+package server;
 
 import java.io.*;
 import ocsf.server.*;
 import java.sql.*;
 import java.util.ArrayList;
-
-
+import java.util.function.BiConsumer;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,24 +15,28 @@ import java.sql.SQLException;
 
 public class BiteMeServer extends AbstractServer 
 {
-  private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/order?serverTimezone=IST";
-  private static final String DB_USER = "root";
-  private static final String DB_PASSWORD = "Aa123456";
+  //private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/order?serverTimezone=IST";
+  //private static final String DB_USER = "root";
+  //private static final String DB_PASSWORD = "Aa123456";
+  private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/";  // URL without database name
+
   private Connection connection;
-  private ConnectionToClient client;
+  private BiConsumer<String, String> clientConnectedCallback;
+
 
   final public static int DEFAULT_PORT = 5555;
   
-  public BiteMeServer(int port) 
-  {
-    super(port);
-  
-  try {
-      connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-      System.out.println("Connected to the database.");
-    } catch (SQLException e) {
-      System.out.println("Database connection failed: " + e.getMessage());
-    }
+  public BiteMeServer(int port, String dbName, String dbUser, String dbPassword) {
+      super(port);
+
+      String fullDBUrl = DB_URL + dbName + "?serverTimezone=IST";
+
+      try {
+          connection = DriverManager.getConnection(fullDBUrl, dbUser, dbPassword);
+          System.out.println("Connected to the database.");
+      } catch (SQLException e) {
+          System.out.println("Database connection failed: " + e.getMessage());
+      }
   }
 
   @Override
@@ -54,6 +58,23 @@ public class BiteMeServer extends AbstractServer
 	    }
 	  }
 
+  @Override
+  protected synchronized void clientConnected(ConnectionToClient client) {
+      try {
+          String clientIpAddress = client.getInetAddress().getHostAddress();
+          String clientHostName = client.getInetAddress().getHostName();
+          if (clientConnectedCallback != null) {
+              clientConnectedCallback.accept(clientHostName, clientIpAddress);
+          }
+      } catch (Exception e) {
+          System.out.println("Error getting client details: " + e.getMessage());
+      }
+  }
+  
+  public void setClientConnectedCallback(BiConsumer<String, String> callback) {
+      this.clientConnectedCallback = callback;
+  }
+  
   private void fetchAndSendOrdersToClient(ConnectionToClient client) {
 	    String sql = "SELECT * FROM orders";
 	    ArrayList<String> orders = new ArrayList<>();
@@ -134,6 +155,7 @@ public class BiteMeServer extends AbstractServer
       ("Server has stopped listening for connections.");
   }
 
+  /*
   public static void main(String[] args) 
   {
     int port = 0; //Port to listen on
@@ -157,6 +179,6 @@ public class BiteMeServer extends AbstractServer
     {
       System.out.println("ERROR - Could not listen for clients!");
     }
-  }
+  }*/
 }
 //End of EchoServer class
