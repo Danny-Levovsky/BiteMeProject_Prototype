@@ -3,6 +3,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -130,17 +131,19 @@ public class ServerDisplayController implements Initializable{
         
         // Create a new BiteMeServer instance with database credentials
         BiteMeServer serverInstance = new BiteMeServer(portNumber, dbName, dbUser, dbPassword);
+        
+     // Sets the callback function for the server instance to the updateClientDetails method of this controller.
+     // This ensures that when a client connects to the server, the updateClientDetails method is called with the client's
+     // hostname and IP address.
+        serverInstance.setClientDetailsCallback(this::updateClientDetails);
 
-        serverInstance.setClientConnectedCallback((clientHostName, clientIpAddress) -> {
-            updateClientDetails(clientHostName, clientIpAddress);
-        });
         
         // Pass the server instance to ServerUI.runServer
         ServerUI.runServer(portNumber, serverInstance);
         serverStatusLabel.setText("Server is listening for connections on port " + portNumber);
         serverStatusLabel.setTextFill(Color.GREEN);
         serverStatusLabel.setVisible(true);
-        
+
         disableButton(connectBtn, true);
         disableButton(disconnectBtn, false);
     }
@@ -167,10 +170,13 @@ public class ServerDisplayController implements Initializable{
         button.setOpacity(disable ? 0.5 : 1.0);
     }
     
+    // Updates the client details on the GUI by setting the client host name and IP address labels.
     public void updateClientDetails(String clientHostName, String clientIpAddress) {
-        ClientHostNameLabel.setText(clientHostName);
-        ClientIPAddLabel.setText(clientIpAddress);
-        System.out.println("Updated GUI with client details: " + clientHostName + " (" + clientIpAddress + ")");
+        Platform.runLater(() -> { // // Ensure the GUI update runs on the JavaFX Application Thread
+            ClientHostNameLabel.setText(clientHostName);
+            ClientIPAddLabel.setText(clientIpAddress);
+            System.out.println("Updated GUI with client details: " + clientHostName + " (" + clientIpAddress + ")");
+        });
 
     }
 

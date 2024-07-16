@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Vector;
 import serverGui.ServerDisplayController;
 import server.BiteMeServer;
 
@@ -34,7 +35,6 @@ public class ServerUI extends Application {
 
         try {
             server.listen(); // Start listening for connections
-           // System.out.println("Server listening for connections on port " + port);
         } catch (Exception ex) {
             System.out.println("ERROR - Could not listen for clients!");
         }
@@ -44,7 +44,6 @@ public class ServerUI extends Application {
         if (server != null && server.isListening()) {
             try {
                 server.close();
-              //  System.out.println("Server has stopped listening for connections.");
             } catch (IOException e) {
                 System.out.println("Error closing the server: " + e.getMessage());
             }

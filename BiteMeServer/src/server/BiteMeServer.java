@@ -11,19 +11,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 
-
-
 public class BiteMeServer extends AbstractServer 
 {
-  //private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/order?serverTimezone=IST";
-  //private static final String DB_USER = "root";
-  //private static final String DB_PASSWORD = "Aa123456";
   private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/";  // URL without database name
-
   private Connection connection;
-  private BiConsumer<String, String> clientConnectedCallback;
+  private BiConsumer<String, String> clientDetailsCallback;  // Callback to update client details in the GUI
 
-
+  
   final public static int DEFAULT_PORT = 5555;
   
   public BiteMeServer(int port, String dbName, String dbUser, String dbPassword) {
@@ -44,9 +38,10 @@ public class BiteMeServer extends AbstractServer
 	    if (msg instanceof ArrayList) {
 	      ArrayList<String> details = (ArrayList<String>) msg;
 	      if (details.size() == 3) {
-	          updateOrder(details,client);
-	        } 
-	      else {
+	          updateOrder(details);
+	        } else if (details.size() >= 5) {
+	          insertOrderDetails(details);
+	        } else {
 	          System.out.println("Insufficient details received from client.");
 	      }
 	    } else if (msg.equals("fetchOrders")) {
@@ -57,24 +52,44 @@ public class BiteMeServer extends AbstractServer
 	      System.out.println("Message received: " + msg);
 	    }
 	  }
+  
+  // Sets the callback function to be used for passing client details (hostname and IP address).
+  // This callback will be invoked whenever a new client connects to the server.
+  public void setClientDetailsCallback(BiConsumer<String, String> callback) {
+      this.clientDetailsCallback = callback;
+  }
 
+  // This method is called whenever a new client connects to the server
+  // The ConnectionToClient object representing the newly connected client.
   @Override
-  protected synchronized void clientConnected(ConnectionToClient client) {
-      try {
-          String clientIpAddress = client.getInetAddress().getHostAddress();
-          String clientHostName = client.getInetAddress().getHostName();
-          if (clientConnectedCallback != null) {
-              clientConnectedCallback.accept(clientHostName, clientIpAddress);
-          }
-      } catch (Exception e) {
-          System.out.println("Error getting client details: " + e.getMessage());
+  protected void clientConnected(ConnectionToClient client) {
+      super.clientConnected(client);
+      String clientHostName = client.getInetAddress().getHostName(); // Get the client's host name
+      String clientIpAddress = client.getInetAddress().getHostAddress();// Get the client's IP address
+      if (clientDetailsCallback != null) {
+          clientDetailsCallback.accept(clientHostName, clientIpAddress); // Invoke the callback with the client details
       }
   }
-  
-  public void setClientConnectedCallback(BiConsumer<String, String> callback) {
-      this.clientConnectedCallback = callback;
+
+  private void insertOrderDetails(ArrayList<String> details) {
+    String sql = "INSERT INTO orders (Restaurant, Order_number, Total_price, Order_list_number, Order_address) VALUES (?, ?, ?, ?, ?)";
+
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, details.get(0));
+      statement.setInt(2, Integer.parseInt(details.get(1)));
+      statement.setInt(3, Integer.parseInt(details.get(2)));
+      statement.setInt(4, Integer.parseInt(details.get(3)));
+      statement.setString(5, details.get(4));
+
+      int rowsInserted = statement.executeUpdate();
+      if (rowsInserted > 0) {
+        System.out.println("A new order was inserted successfully!");
+      }
+    } catch (SQLException e) {
+      System.out.println("Error inserting order: " + e.getMessage());
+    }
   }
-  
+
   private void fetchAndSendOrdersToClient(ConnectionToClient client) {
 	    String sql = "SELECT * FROM orders";
 	    ArrayList<String> orders = new ArrayList<>();
@@ -110,38 +125,35 @@ public class BiteMeServer extends AbstractServer
 	    }
 	  }
   
-  private void updateOrder(ArrayList<String> details,ConnectionToClient client) {
-      String orderNumber = details.get(0);
-      String totalPrice = details.get(1);
-      String orderAddress = details.get(2);
+  private void updateOrder(ArrayList<String> details) {
+	    String orderNumber = details.get(0);
+	    String column = details.get(1);
+	    String newValue = details.get(2);
 
-      String sql = "UPDATE orders SET Total_price = ?, Order_address = ? WHERE Order_number = ?";
+	    if (!column.equals("Total_price") && !column.equals("Order_address")) {
+	      System.out.println("Invalid column name provided: " + column);
+	      return;
+	    }
 
-      try (PreparedStatement statement = connection.prepareStatement(sql)) {
-          statement.setInt(1, Integer.parseInt(totalPrice));
-          statement.setString(2, orderAddress);
-          statement.setInt(3, Integer.parseInt(orderNumber));
+	    String sql = "UPDATE orders SET " + column + " = ? WHERE Order_number = ?";
 
-          int rowsUpdated = statement.executeUpdate();
-          if (rowsUpdated > 0) {
-              System.out.println("Order updated successfully!");
-              sendMessageToClient(client, "Order updated successfully!");
-          } else {
-              System.out.println("Order not found");
-              sendMessageToClient(client, "Order not found");
-          }
-      } catch (SQLException e) {
-          System.out.println("Error updating order: " + e.getMessage());
-      }
-  }
-  
-  private void sendMessageToClient(ConnectionToClient client, String message) {
-	    try {
-	      client.sendToClient(message);
-	    } catch (IOException e) {
-	      System.out.println("Error sending message to client: " + e.getMessage());
+	    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+	      if (column.equals("Total_price")) {
+	        statement.setInt(1, Integer.parseInt(newValue));
+	      } else {
+	        statement.setString(1, newValue);
+	      }
+	      statement.setInt(2, Integer.parseInt(orderNumber));
+
+	      int rowsUpdated = statement.executeUpdate();
+	      if (rowsUpdated > 0) {
+	        System.out.println("Order updated successfully!");
+	      }
+	    } catch (SQLException e) {
+	      System.out.println("Error updating order: " + e.getMessage());
 	    }
 	  }
+
   
   protected void serverStarted()
   {
@@ -155,30 +167,4 @@ public class BiteMeServer extends AbstractServer
       ("Server has stopped listening for connections.");
   }
 
-  /*
-  public static void main(String[] args) 
-  {
-    int port = 0; //Port to listen on
-
-    try
-    {
-      port = Integer.parseInt(args[0]); //Get port from command line
-    }
-    catch(Throwable t)
-    {
-      port = DEFAULT_PORT; //Set port to 5555
-    }
-	
-    BiteMeServer sv = new BiteMeServer(port);
-    
-    try 
-    {
-      sv.listen(); //Start listening for connections
-    } 
-    catch (Exception ex) 
-    {
-      System.out.println("ERROR - Could not listen for clients!");
-    }
-  }*/
 }
-//End of EchoServer class
