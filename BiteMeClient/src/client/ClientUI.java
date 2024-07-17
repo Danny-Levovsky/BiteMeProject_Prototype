@@ -7,9 +7,10 @@ import javafx.stage.Stage;
 
 public class ClientUI extends Application {
 
-    private static final String HOST = "localhost";
+    private static final String IP = "localhost";
     private static final int PORT = 5555;
-
+    ClientConnectController clientConnectController;
+    
     private BiteMeClient biteMeClient;
 
     public static void main(String[] args) {
@@ -18,9 +19,12 @@ public class ClientUI extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        biteMeClient = new BiteMeClient(HOST, PORT);
+    	clientConnectController = new ClientConnectController();
+    	
+    	clientConnectController.getIP();
+    	clientConnectController.start(primaryStage);
+    	
+        //biteMeClient = new BiteMeClient(IP, PORT);
 
-        ClientConnectController cFrame = new ClientConnectController();
-        cFrame.start(primaryStage);
     }
 }

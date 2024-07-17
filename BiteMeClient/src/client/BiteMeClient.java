@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import clientGui.ClientConnectController;
 import clientGui.ClientDisplayController;
 import clientGui.ClientMainMenuController;
 import clientGui.ClientUpdateController;

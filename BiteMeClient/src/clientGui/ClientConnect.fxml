@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="207.0" prefWidth="246.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clientGui.ClientConnectController">
    <children>
@@ -11,5 +12,10 @@
       <Label layoutX="83.0" layoutY="31.0" text="Enter Server IP" />
       <TextField fx:id="txtId" layoutX="49.0" layoutY="91.0" />
       <Button id="btnExit" fx:id="btnConnect" layoutX="49.0" layoutY="168.0" mnemonicParsing="false" onAction="#getBtnConnect" text="Connect" />
+      <Label fx:id="conStatus" layoutX="54.0" layoutY="137.0" text="" textFill="#f70505">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

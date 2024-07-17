@@ -42,6 +42,10 @@
          <font>
             <Font size="18.0" />
          </font></Label>
+      <Label fx:id="clientStatusLabel" layoutX="24.0" layoutY="526.0" text="Status: Not Connected">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font></Label>
       <TextField fx:id="port" layoutX="451.0" layoutY="176.0" prefHeight="25.0" prefWidth="182.0" />
       <TextField fx:id="DBname" layoutX="451.0" layoutY="222.0" prefHeight="25.0" prefWidth="182.0" />
       <TextField fx:id="DBuser" layoutX="451.0" layoutY="269.0" prefHeight="25.0" prefWidth="182.0" />
@@ -71,22 +75,22 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Label fx:id="HostNameLabel" layoutX="22.0" layoutY="520.0" prefHeight="27.0" prefWidth="83.0" text="Host Name:">
+      <Label fx:id="HostNameLabel" layoutX="24.0" layoutY="559.0" prefHeight="27.0" prefWidth="83.0" text="Host Name:">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Label fx:id="IPAddLabel" layoutX="22.0" layoutY="555.0" prefHeight="27.0" prefWidth="75.0" text="IP Address:">
+      <Label fx:id="IPAddLabel" layoutX="24.0" layoutY="594.0" prefHeight="27.0" prefWidth="75.0" text="IP Address:">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Label fx:id="ClientHostNameLabel" layoutX="112.0" layoutY="528.0" prefHeight="20.0" prefWidth="168.0" visible="true">
+      <Label fx:id="ClientHostNameLabel" layoutX="107.0" layoutY="565.0" prefHeight="20.0" prefWidth="168.0" visible="true">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Label fx:id="ClientIPAddLabel" layoutX="112.0" layoutY="559.0" prefHeight="20.0" prefWidth="168.0">
+      <Label fx:id="ClientIPAddLabel" layoutX="107.0" layoutY="596.0" prefHeight="20.0" prefWidth="168.0">
          <font>
             <Font size="14.0" />
          </font>

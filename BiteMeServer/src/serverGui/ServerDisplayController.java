@@ -3,20 +3,18 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.scene.paint.Color;
-import javafx.scene.control.Label;
 import server.BiteMeServer;
 import server.ServerUI;
 
@@ -81,8 +79,10 @@ public class ServerDisplayController implements Initializable{
     
     @FXML
     private Label ClientIPAddLabel;
+    
+    @FXML
+    private Label clientStatusLabel;
 
-    private BiteMeServer server;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -102,7 +102,7 @@ public class ServerDisplayController implements Initializable{
     }
     
     public void start(Stage primaryStage) throws Exception {	
-		Parent root = FXMLLoader.load(getClass().getResource("/ServerGui/ServerDisplay.fxml"));
+		Parent root = FXMLLoader.load(getClass().getResource("/serverGui/ServerDisplay.fxml"));
 				
 		Scene scene = new Scene(root);
 		primaryStage.setTitle("Server menu");
@@ -130,17 +130,20 @@ public class ServerDisplayController implements Initializable{
         
         // Create a new BiteMeServer instance with database credentials
         BiteMeServer serverInstance = new BiteMeServer(portNumber, dbName, dbUser, dbPassword);
+        
+     // Sets the callback function for the server instance to the updateClientDetails method of this controller.
+     // This ensures that when a client connects to the server, the updateClientDetails method is called with the client's
+     // hostname and IP address.
+        serverInstance.setClientDetailsCallback(this::updateClientDetails);
+        serverInstance.setClientDisconnectionCallback(this::updateClientDisconnectionDetails);
 
-        serverInstance.setClientConnectedCallback((clientHostName, clientIpAddress) -> {
-            updateClientDetails(clientHostName, clientIpAddress);
-        });
         
         // Pass the server instance to ServerUI.runServer
         ServerUI.runServer(portNumber, serverInstance);
         serverStatusLabel.setText("Server is listening for connections on port " + portNumber);
         serverStatusLabel.setTextFill(Color.GREEN);
         serverStatusLabel.setVisible(true);
-        
+
         disableButton(connectBtn, true);
         disableButton(disconnectBtn, false);
     }
@@ -167,11 +170,23 @@ public class ServerDisplayController implements Initializable{
         button.setOpacity(disable ? 0.5 : 1.0);
     }
     
+    // Updates the client details on the GUI by setting the client host name and IP address labels.
     public void updateClientDetails(String clientHostName, String clientIpAddress) {
-        ClientHostNameLabel.setText(clientHostName);
-        ClientIPAddLabel.setText(clientIpAddress);
-        System.out.println("Updated GUI with client details: " + clientHostName + " (" + clientIpAddress + ")");
+        Platform.runLater(() -> { // Ensure the GUI update runs on the JavaFX Application Thread
+            ClientHostNameLabel.setText(clientHostName);
+            ClientIPAddLabel.setText(clientIpAddress);
+            clientStatusLabel.setText("Status: Connected");
+            System.out.println("Client connected");
+            System.out.println("Updated GUI with client details: " + clientHostName + " (" + clientIpAddress + ")");
+        });
 
+    }
+    
+    public void updateClientDisconnectionDetails() {
+        Platform.runLater(() -> {
+            clientStatusLabel.setText("Status: Not Connected");
+            System.out.println("Client disconnected");
+        });
     }
 
 }
